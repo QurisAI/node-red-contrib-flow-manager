@@ -343,7 +343,7 @@ const onDemandFlowsManager = {
 
 async function readActiveProject() {
     try {
-        const redConfig = await fs.readJson(path.join(RED.settings.userDir, '.config.json'));
+        const redConfig = await fs.readJson(path.join(RED.settings.userDir, '.config.projects.json'));
         return redConfig.projects.activeProject;
     } catch (e) {
         return null;
@@ -774,7 +774,7 @@ async function main() {
     await startFlowManager();
     if(RED.settings.editorTheme.projects.enabled) {
         let lastProject = await readActiveProject();
-        fs.watch(path.join(RED.settings.userDir, '.config.json'), debounce(async () => {
+        fs.watch(path.join(RED.settings.userDir, '.config.projects.json'), debounce(async () => {
             const newProject = await readActiveProject();
             if(lastProject != newProject) {
                 lastProject = newProject;
