@@ -10,6 +10,7 @@ const path = require('path')
     , crypto = require('crypto')
     , debounce = require('./debounce')
     , axios = require('axios')
+    , stringify = require('json-stable-stringify')
 ;
 
 function execShellCommand(cmd) {
@@ -39,7 +40,7 @@ function encodeFileName(origName) {
 }
 
 function stringifyFormattedFileJson(nodes) {
-    const str = JSON.stringify(nodes, undefined, 2);
+    const str = stringify(nodes, {space: 2});
     return eol.auto(str);
 }
 
@@ -96,7 +97,7 @@ PRIVATERED.runtime.storage.saveFlows = async function newSaveFlows(data) {
                 for (const key in envConfig) {
                     const val = envConfig[key];
                     try {
-                        if (JSON.stringify(node[key]) !== JSON.stringify(val)) {
+                        if (stringify(node[key]) !== stringify(val)) {
                             if (!envNodePropsChangedByUser[node.id]) envNodePropsChangedByUser[node.id] = {};
                             envNodePropsChangedByUser[node.id][key] = val;
                             node[key] = val;
@@ -151,7 +152,7 @@ PRIVATERED.runtime.storage.saveFlows = async function newSaveFlows(data) {
             }
 
             // Potentially we save different flow file than the one we deploy, like "credentials" property is deleted in flow file.
-            const flowNodes = JSON.parse(JSON.stringify(allFlows[flowId].nodes));
+            const flowNodes = JSON.parse(stringify(allFlows[flowId].nodes));
 
             for(const node of flowNodes) {
                 // Set properties used by envnodes to mared them as flow-manager managed.
@@ -232,8 +233,8 @@ async function writeFlowFile(filePath, flowStrOrObject) {
     async function isReallyChanged(newObj) {
         try {
             const oldObj = (await readFlowFile(filePath)).obj;
-            const oldSet = new Set(oldObj.map(item=>JSON.stringify(item)));
-            const newSet = new Set(newObj.map(item=>JSON.stringify(item)));
+            const oldSet = new Set(oldObj.map(item=>stringify(item)));
+            const newSet = new Set(newObj.map(item=>stringify(item)));
 
             if (oldSet.size !== newSet.size) return true;
             newSet.forEach(function (item) {
@@ -382,7 +383,7 @@ async function main() {
         const flowsInfo = await loadFlows(null, true);
 
         retVal.flows = flowsInfo.flows;
-        retVal.rev = calculateRevision(JSON.stringify(flowsInfo.flows));
+        retVal.rev = calculateRevision(stringify(flowsInfo.flows));
 
         revisions.byFlowName = flowsInfo.flowVersions;
         revisions.bySubflowName = flowsInfo.subflowVersions;
@@ -1025,7 +1026,7 @@ async function main() {
             }
 
             if(indexOfFlowType === -1) {
-                return res.status(400).send({error:"Unrecognized flow type, please use one of "+JSON.stringify(flowTypes).split('"').join("")});
+                return res.status(400).send({error:"Unrecognized flow type, please use one of "+stringify(flowTypes).split('"').join("")});
             } else if(!fullPath) {
                 return res.status(400).send({error:"malformed flow filename"});
             }
