@@ -247,7 +247,7 @@ async function writeFlowFile(filePath, flowStrOrObject) {
 
     let changed;
     if (typeof flowStrOrObject === 'string' || flowStrOrObject instanceof String) {
-        changed = await isReallyChanged(filePath.endsWith('.yaml')?YAML.safeLoad(flowStrOrObject):JSON.parse(flowStrOrObject));
+        changed = await isReallyChanged(filePath.endsWith('.yaml')?YAML.safeLoad(flowStrOrObject):stringifyFormattedFileJson(JSON.parse(flowStrOrObject)));
         str = flowStrOrObject;
     } else if(flowManagerSettings.fileFormat === 'yaml') {
         changed = await isReallyChanged(flowStrOrObject);
