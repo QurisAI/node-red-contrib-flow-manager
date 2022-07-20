@@ -40,14 +40,16 @@ function encodeFileName(origName) {
 }
 
 function stringifyFormattedFileJson(nodes) {
-    sorted_nodes = nodes.sort((a, b) => {
-        let _a = `${a.type}-${a.name}-${a.id}`
-        let _b = `${b.type}-${b.name}-${b.id}`
+    if (Array.isArray(nodes)) {
+        nodes = nodes.sort((a, b) => {
+            let _a = `${a.type}-${a.name}-${a.id}`
+            let _b = `${b.type}-${b.name}-${b.id}`
 
-        return _a < _b ? 1 : -1;
-      })
+            return _a < _b ? 1 : -1;
+          })
+    }
 
-    const str = stringify(sorted_nodes, {space: 2});
+    const str = stringify(nodes, {space: 2});
     return eol.auto(str);
 }
 
