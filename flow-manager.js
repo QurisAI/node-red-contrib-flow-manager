@@ -344,7 +344,7 @@ const onDemandFlowsManager = {
 async function readActiveProject() {
     try {
         const redConfig = await fs.readJson(path.join(RED.settings.userDir, '.config.projects.json'));
-        return redConfig.projects.activeProject;
+        return redConfig.activeProject;
     } catch (e) {
         return null;
     }
@@ -426,6 +426,8 @@ async function main() {
             configNodesFilePathWithoutExtension: path.resolve(basePath, 'config-nodes'),
             nodesOrderFilePath: path.resolve(basePath, 'flow-manager-nodes-order.json'),
         });
+
+        console.log('FlowManager Configuration', directories)
 
         // Read flow-manager settings
         let needToSaveFlowManagerSettings = false;
