@@ -350,6 +350,17 @@ async function readActiveProject() {
     }
 }
 
+async function readRootPath(project) {
+    let rootPath = "";
+    try {
+        const redConfig = await fs.readJson(path.join(RED.settings.userDir, '.config.projects.json'));
+        rootPath = redConfig?.projects?.[project]?.rootPath;
+    } catch (e) {
+    }
+
+    return rootPath || "";
+}
+
 const revisions = {
     byFlowName: {},
     bySubflowName: {},
@@ -400,12 +411,13 @@ async function main() {
     }
 
     async function refreshDirectories() {
-        let basePath, project = null;
+        let basePath, project, rootPath = null;
         if(RED.settings.editorTheme.projects.enabled) {
             project = await readActiveProject();
 
             if(project) {
-                const activeProjectPath = path.join(RED.settings.userDir, 'projects', project);
+                rootPath = await readRootPath(project);
+                const activeProjectPath = path.join(RED.settings.userDir, 'projects', project, rootPath);
                 basePath = activeProjectPath;
             } else {
                 basePath = RED.settings.userDir;
@@ -427,7 +439,7 @@ async function main() {
             nodesOrderFilePath: path.resolve(basePath, 'flow-manager-nodes-order.json'),
         });
 
-        console.log('FlowManager Configuration', directories)
+        // console.log('FlowManager Configuration', directories);
 
         // Read flow-manager settings
         let needToSaveFlowManagerSettings = false;
